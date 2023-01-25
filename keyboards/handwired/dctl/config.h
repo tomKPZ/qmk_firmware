@@ -57,6 +57,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define PMW3389_CPI 4000
 #define POINTING_DEVICE_MOTION_PIN C7
 
+// Use 16-bit mouse report values.
+#define MOUSE_EXTENDED_REPORT
+
 // Double tap a key to lock it.
 #define ONESHOT_TAP_TOGGLE 2
 
