@@ -9,9 +9,14 @@
 // Only consider events within this time window.
 #define EVENT_WINDOW_MS 275
 // Suppress mouse motion this long after clicking.
-#define MOUSE_INHIBIT_MS 80
+#define MOUSE_MOTION_INHIBIT_MS 80
+// Suppress the mouse layer this long after a right keypress.
+#define MOUSE_LAYER_INHIBIT_MS 175
 // Ideally a power of 2 to avoid division.
 #define SENSITIVITY 4
+
+static bool inhibit_mouse_layer;
+static uint16_t last_right_press;
 
 static bool inhibit_mouse_move;
 static uint8_t button_state;
@@ -25,8 +30,8 @@ static uint16_t events_timers[N_EVENTS];
 static int16_t rem_dx = 0;
 static int16_t rem_dy = 0;
 
-static void add_event(void) {
-    events_timers[(events_start + events_size) % N_EVENTS] = timer_read();
+static void add_event(uint16_t now) {
+    events_timers[(events_start + events_size) % N_EVENTS] = now;
     if (events_size == N_EVENTS) {
         events_start++;
     } else {
@@ -39,7 +44,7 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         return mouse_report;
     }
 
-    add_event();
+    add_event(timer_read());
 
     rem_dx += mouse_report.x;
     rem_dy += mouse_report.y;
@@ -64,7 +69,7 @@ void matrix_scan_user(void) {
     }
     if (!auto_mouse_enabled) {
         // Don't enable the layer if not necessary since it will interrupt mouse drags.
-        if (events_size == N_EVENTS) {
+        if (!inhibit_mouse_layer && events_size == N_EVENTS) {
             layer_on(_MOUSE);
             auto_mouse_enabled = true;
         }
@@ -72,17 +77,31 @@ void matrix_scan_user(void) {
         layer_off(_MOUSE);
         auto_mouse_enabled = false;
     }
-    if (inhibit_mouse_move && timer_elapsed(btn1_changed) >= MOUSE_INHIBIT_MS) {
+    if (inhibit_mouse_move && timer_elapsed(btn1_changed) >= MOUSE_MOTION_INHIBIT_MS) {
         inhibit_mouse_move = false;
+    }
+    if (inhibit_mouse_layer &&
+        timer_elapsed(last_right_press) >= MOUSE_LAYER_INHIBIT_MS) {
+        inhibit_mouse_layer = false;
     }
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     process_repeat_key(keycode, record);
+    uint16_t now = timer_read();
+    if (record->event.pressed && record->event.key.row >= 6 &&
+        record->event.key.row <= 10) {
+        inhibit_mouse_layer = true;
+        last_right_press = now;
+        if (auto_mouse_enabled) {
+            layer_off(_MOUSE);
+            auto_mouse_enabled = false;
+        }
+    }
     switch (keycode) {
         case KC_BTN1 ... KC_BTN5: {
             if (keycode == KC_BTN1) {
-                btn1_changed = timer_read();
+                btn1_changed = now;
                 inhibit_mouse_move = true;
             }
             uint8_t button_mask = 1 << (keycode - KC_BTN1);
@@ -90,7 +109,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 button_state |= button_mask;
             } else {
                 button_state &= ~button_mask;
-                add_event();
+                add_event(now);
             }
         }
     }

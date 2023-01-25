@@ -13,8 +13,6 @@
 #define APT DF(_APT)
 #define QWERTY DF(_QWERTY)
 
-#define TGMOUSE TG(_MOUSE)
-
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // Template
@@ -73,11 +71,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                OS_LALT, OS_LCTL, OS_LGUI,     OS_LGUI, OS_LCTL, OS_LALT),
 
     [_MOUSE] = LAYOUT(
-                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,     TGMOUSE, TGMOUSE, TGMOUSE, TGMOUSE,
-    XXXXXXX, XXXXXXX, XXXXXXX, KC_BTN4, KC_BTN5, KC_WH_U,     TGMOUSE, TGMOUSE, TGMOUSE, TGMOUSE, TGMOUSE, TGMOUSE,
-    XXXXXXX, XXXXXXX, KC_BTN3, KC_BTN2, KC_BTN1, KC_WH_D,     TGMOUSE, TGMOUSE, TGMOUSE, TGMOUSE, TGMOUSE, TGMOUSE,
-    XXXXXXX, C(KC_Z), C(KC_X), C(KC_C), C(KC_V), XXXXXXX,     TGMOUSE, TGMOUSE, TGMOUSE, TGMOUSE, TGMOUSE, TGMOUSE,
-                      XXXXXXX, XXXXXXX,                                         TGMOUSE, TGMOUSE,
+                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,     _______, _______, _______, _______,
+    XXXXXXX, XXXXXXX, XXXXXXX, KC_BTN4, KC_BTN5, KC_WH_U,     _______, _______, _______, _______, _______, _______,
+    XXXXXXX, XXXXXXX, KC_BTN3, KC_BTN2, KC_BTN1, KC_WH_D,     _______, _______, _______, _______, _______, _______,
+    XXXXXXX, C(KC_Z), C(KC_X), C(KC_C), C(KC_V), XXXXXXX,     _______, _______, _______, _______, _______, _______,
+                      XXXXXXX, XXXXXXX,                                         _______, _______,
                                OS_NAV,  OS_LSFT, OS_SYM,      OS_SYM,  OS_LSFT, OS_NAV,
                                OS_LALT, OS_LCTL, OS_LGUI,     OS_LGUI, OS_LCTL, OS_LALT),
 };
