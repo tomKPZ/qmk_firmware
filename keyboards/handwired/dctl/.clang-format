@@ -1,0 +1,6 @@
+Language:     Cpp
+BasedOnStyle: Chromium
+Standard:     Auto
+ColumnLimit:  90
+IndentWidth:  4
+InsertBraces: True

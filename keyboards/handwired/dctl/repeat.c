@@ -8,15 +8,15 @@
 // Used to extract the basic tapping keycode from a dual-role key.
 // Example: GET_TAP_KC(MT(MOD_RSFT, KC_E)) == KC_E
 #define GET_TAP_KC(dual_role_key) dual_role_key & 0xFF
-static uint16_t last_keycode  = KC_NO;
-static uint8_t  last_modifier = 0;
+static uint16_t last_keycode = KC_NO;
+static uint8_t last_modifier = 0;
 
 // Initialize variables holding the bitfield
 // representation of active modifiers.
 static uint8_t mod_state;
 static uint8_t oneshot_mod_state;
 
-static void process_repeat_key_aux(uint16_t keycode, const keyrecord_t *record) {
+static void process_repeat_key_aux(uint16_t keycode, const keyrecord_t* record) {
     if (keycode != REPEAT) {
         // Early return when holding down a pure layer key
         // to retain modifiers
@@ -55,8 +55,8 @@ static void process_repeat_key_aux(uint16_t keycode, const keyrecord_t *record) 
     }
 }
 
-void process_repeat_key(uint16_t keycode, const keyrecord_t *record) {
+void process_repeat_key(uint16_t keycode, const keyrecord_t* record) {
     process_repeat_key_aux(keycode, record);
-    mod_state         = get_mods();
+    mod_state = get_mods();
     oneshot_mod_state = get_oneshot_mods();
 }
