@@ -8,11 +8,14 @@
 #define N_MOTION_TIMINGS 32
 // Only consider events within this many milliseconds ago.
 #define MOTION_WINDOW_MS 300
+// Time to suppress mouse events after clicking.
+#define MOUSE_INHIBIT_MS 80
 
 // Ideally a power of 2 to avoid division.
 #define SENS 4
 
-static uint8_t button_state;
+static uint8_t  button_state;
+static uint16_t btn1_changed;
 
 static bool     auto_mouse_enabled;
 static uint16_t last_mouse;
@@ -55,6 +58,11 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         auto_mouse_enabled = true;
     }
 
+    if (timer_elapsed(btn1_changed) < MOUSE_INHIBIT_MS) {
+        mouse_report.x = 0;
+        mouse_report.y = 0;
+    }
+
     return mouse_report;
 }
 
@@ -69,6 +77,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     process_repeat_key(keycode, record);
     switch (keycode) {
         case KC_BTN1 ... KC_BTN5: {
+            if (keycode == KC_BTN1) btn1_changed = timer_read();
             uint8_t button_mask = 1 << (keycode - KC_BTN1);
             if (record->event.pressed) {
                 button_state |= button_mask;

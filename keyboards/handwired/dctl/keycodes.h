@@ -8,8 +8,8 @@ enum custom_keycodes {
 };
 
 enum layers {
-    _APT        = 0,
-    _QWERTY     = 1,
+    _QWERTY     = 0,
+    _APT        = 1,
     _SYMBOL     = 2,
     _NAVIGATION = 3,
     _FUNCTION   = 4,
