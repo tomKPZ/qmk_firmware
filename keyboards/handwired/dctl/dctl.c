@@ -62,8 +62,9 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 }
 
 void matrix_scan_user(void) {
+    uint16_t now = timer_read();
     while (events_size &&
-           timer_elapsed(events_timers[events_start % N_EVENTS]) > EVENT_WINDOW_MS) {
+           now >= events_timers[events_start % N_EVENTS] + EVENT_WINDOW_MS) {
         events_start++;
         events_size--;
     }
@@ -77,11 +78,10 @@ void matrix_scan_user(void) {
         layer_off(_MOUSE);
         auto_mouse_enabled = false;
     }
-    if (inhibit_mouse_move && timer_elapsed(btn1_changed) >= MOUSE_MOTION_INHIBIT_MS) {
+    if (inhibit_mouse_move && now >= btn1_changed + MOUSE_MOTION_INHIBIT_MS) {
         inhibit_mouse_move = false;
     }
-    if (inhibit_mouse_layer &&
-        timer_elapsed(last_right_press) >= MOUSE_LAYER_INHIBIT_MS) {
+    if (inhibit_mouse_layer && now >= last_right_press + MOUSE_LAYER_INHIBIT_MS) {
         inhibit_mouse_layer = false;
     }
 }
