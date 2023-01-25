@@ -14,6 +14,7 @@
 // Ideally a power of 2 to avoid division.
 #define SENS 4
 
+static bool inhibit_mouse_move;
 static uint8_t button_state;
 static uint16_t btn1_changed;
 
@@ -34,17 +35,6 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     }
 
     last_mouse = timer_read();
-
-    rem_dx += mouse_report.x;
-    rem_dy += mouse_report.y;
-    mouse_report.x = rem_dx / SENS;
-    mouse_report.y = rem_dy / SENS;
-    rem_dx -= SENS * mouse_report.x;
-    rem_dy -= SENS * mouse_report.y;
-    if (!mouse_report.x && !mouse_report.y) {
-        return mouse_report;
-    }
-
     motion_timers[motion_end] = last_mouse;
     if (motion_size == N_MOTION_TIMINGS) {
         motion_start = (motion_start + 1) % N_MOTION_TIMINGS;
@@ -64,9 +54,20 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         auto_mouse_enabled = true;
     }
 
-    if (timer_elapsed(btn1_changed) < MOUSE_INHIBIT_MS) {
+    if (inhibit_mouse_move && timer_elapsed(btn1_changed) >= MOUSE_INHIBIT_MS) {
+        inhibit_mouse_move = false;
+    }
+
+    rem_dx += mouse_report.x;
+    rem_dy += mouse_report.y;
+    if (inhibit_mouse_move) {
         mouse_report.x = 0;
         mouse_report.y = 0;
+    } else {
+        mouse_report.x = rem_dx / SENS;
+        mouse_report.y = rem_dy / SENS;
+        rem_dx -= SENS * mouse_report.x;
+        rem_dy -= SENS * mouse_report.y;
     }
 
     return mouse_report;
@@ -86,6 +87,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
         case KC_BTN1 ... KC_BTN5: {
             if (keycode == KC_BTN1) {
                 btn1_changed = timer_read();
+                inhibit_mouse_move = true;
             }
             uint8_t button_mask = 1 << (keycode - KC_BTN1);
             if (record->event.pressed) {
