@@ -2,61 +2,44 @@
 #include "keycodes.h"
 #include "repeat.h"
 
-#define MOTION_IDLE_TIME 250
-
-// Auto-trigger the mouse layer after this many motion events.
-#define N_MOTION_TIMINGS 32
-// Only consider events within this many milliseconds ago.
-#define MOTION_WINDOW_MS 300
-// Time to suppress mouse events after clicking.
+// Auto-trigger the mouse layer after this many mouse events.
+#define N_EVENTS 16
+// Disable the mouse layer after draining to this many mouse events.
+#define N_IDLE_EVENTS 1
+// Only consider events within this time window.
+#define EVENT_WINDOW_MS 275
+// Suppress mouse motion this long after clicking.
 #define MOUSE_INHIBIT_MS 80
-
 // Ideally a power of 2 to avoid division.
-#define SENS 4
+#define SENSITIVITY 4
 
 static bool inhibit_mouse_move;
 static uint8_t button_state;
 static uint16_t btn1_changed;
 
 static bool auto_mouse_enabled;
-static uint16_t last_mouse;
-
-static uint8_t motion_size;
-static uint8_t motion_start;
-static uint8_t motion_end;
-static uint16_t motion_timers[N_MOTION_TIMINGS];
+static uint8_t events_size;
+static uint8_t events_start;
+static uint16_t events_timers[N_EVENTS];
 
 static int16_t rem_dx = 0;
 static int16_t rem_dy = 0;
+
+static void add_event(void) {
+    events_timers[(events_start + events_size) % N_EVENTS] = timer_read();
+    if (events_size == N_EVENTS) {
+        events_start++;
+    } else {
+        events_size++;
+    }
+}
 
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     if (!mouse_report.x && !mouse_report.y) {
         return mouse_report;
     }
 
-    last_mouse = timer_read();
-    motion_timers[motion_end] = last_mouse;
-    if (motion_size == N_MOTION_TIMINGS) {
-        motion_start = (motion_start + 1) % N_MOTION_TIMINGS;
-    } else {
-        motion_size++;
-    }
-    motion_end = (motion_end + 1) % N_MOTION_TIMINGS;
-
-    while (motion_size && timer_elapsed(motion_timers[motion_start]) > MOTION_WINDOW_MS) {
-        motion_start = (motion_start + 1) % N_MOTION_TIMINGS;
-        motion_size--;
-    }
-    // Don't enable the layer if not necessary since it will interrupt mouse
-    // drags.
-    if (motion_size == N_MOTION_TIMINGS && !IS_LAYER_ON(_MOUSE)) {
-        layer_on(_MOUSE);
-        auto_mouse_enabled = true;
-    }
-
-    if (inhibit_mouse_move && timer_elapsed(btn1_changed) >= MOUSE_INHIBIT_MS) {
-        inhibit_mouse_move = false;
-    }
+    add_event();
 
     rem_dx += mouse_report.x;
     rem_dy += mouse_report.y;
@@ -64,20 +47,33 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         mouse_report.x = 0;
         mouse_report.y = 0;
     } else {
-        mouse_report.x = rem_dx / SENS;
-        mouse_report.y = rem_dy / SENS;
-        rem_dx -= SENS * mouse_report.x;
-        rem_dy -= SENS * mouse_report.y;
+        mouse_report.x = rem_dx / SENSITIVITY;
+        mouse_report.y = rem_dy / SENSITIVITY;
+        rem_dx -= SENSITIVITY * mouse_report.x;
+        rem_dy -= SENSITIVITY * mouse_report.y;
     }
 
     return mouse_report;
 }
 
 void matrix_scan_user(void) {
-    if (auto_mouse_enabled && !button_state &&
-        (timer_elapsed(last_mouse) > MOTION_IDLE_TIME)) {
+    while (events_size &&
+           timer_elapsed(events_timers[events_start % N_EVENTS]) > EVENT_WINDOW_MS) {
+        events_start++;
+        events_size--;
+    }
+    if (!auto_mouse_enabled) {
+        // Don't enable the layer if not necessary since it will interrupt mouse drags.
+        if (events_size == N_EVENTS) {
+            layer_on(_MOUSE);
+            auto_mouse_enabled = true;
+        }
+    } else if (!button_state && events_size <= N_IDLE_EVENTS) {
         layer_off(_MOUSE);
         auto_mouse_enabled = false;
+    }
+    if (inhibit_mouse_move && timer_elapsed(btn1_changed) >= MOUSE_INHIBIT_MS) {
+        inhibit_mouse_move = false;
     }
 }
 
@@ -94,7 +90,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 button_state |= button_mask;
             } else {
                 button_state &= ~button_mask;
-                last_mouse = timer_read();
+                add_event();
             }
         }
     }
