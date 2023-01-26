@@ -87,8 +87,10 @@ void matrix_scan_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     process_repeat_key(keycode, record);
+
     uint16_t now = timer_read();
-    if (record->event.pressed && record->event.key.row >= 6 && record->event.key.row <= 10) {
+    uint8_t  row = record->event.key.row;
+    if (record->event.pressed && row >= 6 && row <= 10) {
         inhibit_mouse_layer = true;
         last_right_press    = now;
         if (auto_mouse_enabled) {
@@ -96,20 +98,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             auto_mouse_enabled = false;
         }
     }
-    switch (keycode) {
-        case KC_BTN1 ... KC_BTN5: {
-            if (keycode == KC_BTN1) {
-                btn1_changed       = now;
-                inhibit_mouse_move = true;
-            }
-            uint8_t button_mask = 1 << (keycode - KC_BTN1);
-            if (record->event.pressed) {
-                button_state |= button_mask;
-            } else {
-                button_state &= ~button_mask;
-                add_event(now);
-            }
+
+    if (keycode == KC_BTN1) {
+        btn1_changed       = now;
+        inhibit_mouse_move = true;
+    }
+
+    if (keycode >= KC_BTN1 && keycode <= KC_BTN5) {
+        uint8_t button_mask = 1 << (keycode - KC_BTN1);
+        if (record->event.pressed) {
+            button_state |= button_mask;
+        } else {
+            button_state &= ~button_mask;
         }
     }
+
     return true;
 }
