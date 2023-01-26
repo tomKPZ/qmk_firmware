@@ -9,10 +9,10 @@ enum custom_keycodes {
 };
 
 enum layers {
-    _QWERTY = 0,
-    _APT = 1,
-    _SYMBOL = 2,
+    _QWERTY     = 0,
+    _APT        = 1,
+    _SYMBOL     = 2,
     _NAVIGATION = 3,
-    _FUNCTION = 4,
-    _MOUSE = 5,
+    _FUNCTION   = 4,
+    _MOUSE      = 5,
 };

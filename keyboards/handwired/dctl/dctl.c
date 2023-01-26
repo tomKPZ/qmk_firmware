@@ -15,16 +15,16 @@
 // Ideally a power of 2 to avoid division.
 #define SENSITIVITY 4
 
-static bool inhibit_mouse_layer;
+static bool     inhibit_mouse_layer;
 static uint16_t last_right_press;
 
-static bool inhibit_mouse_move;
-static uint8_t button_state;
+static bool     inhibit_mouse_move;
+static uint8_t  button_state;
 static uint16_t btn1_changed;
 
-static bool auto_mouse_enabled;
-static uint8_t events_size;
-static uint8_t events_start;
+static bool     auto_mouse_enabled;
+static uint8_t  events_size;
+static uint8_t  events_start;
 static uint16_t events_timers[N_EVENTS];
 
 static int16_t rem_dx = 0;
@@ -63,8 +63,7 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 
 void matrix_scan_user(void) {
     uint16_t now = timer_read();
-    while (events_size &&
-           now >= events_timers[events_start % N_EVENTS] + EVENT_WINDOW_MS) {
+    while (events_size && now >= events_timers[events_start % N_EVENTS] + EVENT_WINDOW_MS) {
         events_start++;
         events_size--;
     }
@@ -89,10 +88,9 @@ void matrix_scan_user(void) {
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     process_repeat_key(keycode, record);
     uint16_t now = timer_read();
-    if (record->event.pressed && record->event.key.row >= 6 &&
-        record->event.key.row <= 10) {
+    if (record->event.pressed && record->event.key.row >= 6 && record->event.key.row <= 10) {
         inhibit_mouse_layer = true;
-        last_right_press = now;
+        last_right_press    = now;
         if (auto_mouse_enabled) {
             layer_off(_MOUSE);
             auto_mouse_enabled = false;
@@ -101,7 +99,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
         case KC_BTN1 ... KC_BTN5: {
             if (keycode == KC_BTN1) {
-                btn1_changed = now;
+                btn1_changed       = now;
                 inhibit_mouse_move = true;
             }
             uint8_t button_mask = 1 << (keycode - KC_BTN1);
