@@ -5,15 +5,15 @@
 // Auto-trigger the mouse layer after this many mouse events.
 #define N_EVENTS 16
 // Disable the mouse layer after draining to this many mouse events.
-#define N_IDLE_EVENTS 1
+#define N_IDLE_EVENTS 4
 // Only consider events within this time window.
-#define EVENT_WINDOW_MS 275
+#define EVENT_WINDOW_MS 100
 // Suppress mouse motion this long after clicking.
 #define MOUSE_MOTION_INHIBIT_MS 80
 // Suppress the mouse layer this long after a right keypress.
 #define MOUSE_LAYER_INHIBIT_MS 175
 // Ideally a power of 2 to avoid division.
-#define SENSITIVITY 4
+#define SENSITIVITY 16
 
 static bool     inhibit_mouse_layer;
 static uint16_t last_right_press;
