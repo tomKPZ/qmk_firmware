@@ -3,7 +3,7 @@
 #include "repeat.h"
 
 // Auto-trigger the mouse layer after this many mouse events.
-#define N_EVENTS 16
+#define N_EVENTS 32
 // Disable the mouse layer after draining to this many mouse events.
 #define N_IDLE_EVENTS 4
 // Only consider events within this time window.
@@ -11,7 +11,7 @@
 // Suppress mouse motion this long after clicking.
 #define MOUSE_MOTION_INHIBIT_MS 80
 // Suppress the mouse layer this long after a right keypress.
-#define MOUSE_LAYER_INHIBIT_MS 175
+#define MOUSE_LAYER_INHIBIT_MS 250
 // Ideally a power of 2 to avoid division.
 #define SENSITIVITY 16
 
