@@ -1,11 +1,11 @@
 #pragma once
 
-#include "quantum.h"
+#include "quantum/keycodes.h"
 
 enum custom_keycodes {
     // it can be called REP if you want but "REPEAT" is clearer and still fits
     // under the 8 char "limit"
-    REPEAT = SAFE_RANGE,
+    REPEAT = QK_USER,
 };
 
 enum layers {
