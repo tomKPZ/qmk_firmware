@@ -23,14 +23,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_ROWS 12
 #define MATRIX_COLS 6
 
-#define MATRIX_ROW_PINS \
-    { D4, B4, B5, E6, D7, C6 }
-#define MATRIX_COL_PINS \
-    { F4, F0, F5, B6, F7, F6 }
-#define MATRIX_ROW_PINS_RIGHT \
-    { F4, F5, F7, B6, F6, F0 }
-#define MATRIX_COL_PINS_RIGHT \
-    { D7, C6, D4, E6, B4, B5 }
+#define MATRIX_ROW_PINS {D4, B4, B5, E6, D7, C6}
+#define MATRIX_COL_PINS {F4, F0, F5, B6, F7, F6}
+#define MATRIX_ROW_PINS_RIGHT {F4, F5, F7, B6, F6, F0}
+#define MATRIX_COL_PINS_RIGHT {D7, C6, D4, E6, B4, B5}
 
 #define SPLIT_HAND_PIN B7
 
@@ -70,7 +66,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TAPPING_TERM 200
 // Allow quicker usage of mod-tap keys
 #define PERMISSIVE_HOLD
-// Allow rolling mod-tap keys
-#define IGNORE_MOD_TAP_INTERRUPT
 // Disable key-repeat for mod-taps by double tapping
 // #define TAPPING_FORCE_HOLD
