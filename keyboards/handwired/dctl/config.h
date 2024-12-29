@@ -53,6 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Use 16-bit mouse report values.
 #define MOUSE_EXTENDED_REPORT
+#define WHEEL_EXTENDED_REPORT
 
 // Double tap a key to lock it.
 #define ONESHOT_TAP_TOGGLE 2
