@@ -50,6 +50,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define POINTING_DEVICE_INVERT_X
 #define PMW33XX_CPI 16000
 #define POINTING_DEVICE_MOTION_PIN C7
+#define PMW33XX_UPLOAD_SROM
 
 // Use 16-bit mouse report values.
 #define MOUSE_EXTENDED_REPORT
