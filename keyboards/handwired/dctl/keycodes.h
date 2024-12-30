@@ -5,7 +5,8 @@
 enum custom_keycodes {
     // it can be called REP if you want but "REPEAT" is clearer and still fits
     // under the 8 char "limit"
-    REPEAT = QK_USER,
+    REPEAT  = QK_USER,
+    USCROLL = QK_USER + 1,
 };
 
 enum layers {

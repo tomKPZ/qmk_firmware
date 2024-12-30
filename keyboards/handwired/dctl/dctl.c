@@ -13,7 +13,9 @@
 // Suppress the mouse layer this long after a right keypress.
 #define MOUSE_LAYER_INHIBIT_MS 250
 // Ideally a power of 2 to avoid division.
-#define SENSITIVITY 16
+#define MOVE_SENSITIVITY 16
+// Ideally a power of 2 to avoid division.
+#define SCROLL_SENSITIVITY 16
 
 static bool     inhibit_mouse_layer;
 static uint16_t last_right_press;
@@ -29,6 +31,8 @@ static uint16_t events_timers[N_EVENTS];
 
 static int16_t rem_dx = 0;
 static int16_t rem_dy = 0;
+
+static bool scroll_pressed = false;
 
 static void add_event(uint16_t now) {
     events_timers[(events_start + events_size) % N_EVENTS] = now;
@@ -52,10 +56,20 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         mouse_report.x = 0;
         mouse_report.y = 0;
     } else {
-        mouse_report.x = rem_dx / SENSITIVITY;
-        mouse_report.y = rem_dy / SENSITIVITY;
-        rem_dx -= SENSITIVITY * mouse_report.x;
-        rem_dy -= SENSITIVITY * mouse_report.y;
+        int16_t sens = scroll_pressed ? SCROLL_SENSITIVITY : MOVE_SENSITIVITY;
+        int16_t dx   = rem_dx / sens;
+        int16_t dy   = rem_dy / sens;
+        if (scroll_pressed) {
+            mouse_report.x = 0;
+            mouse_report.y = 0;
+            mouse_report.h = dx;
+            mouse_report.v = -dy;
+        } else {
+            mouse_report.x = dx;
+            mouse_report.y = dy;
+        }
+        rem_dx -= sens * dx;
+        rem_dy -= sens * dy;
     }
 
     return mouse_report;
@@ -111,6 +125,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
         } else {
             button_state &= ~button_mask;
         }
+    }
+
+    if (keycode == USCROLL) {
+        scroll_pressed = record->event.pressed;
     }
 
     return true;
