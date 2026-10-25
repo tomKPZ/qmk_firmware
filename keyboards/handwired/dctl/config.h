@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SPLIT_MAX_CONNECTION_ERRORS 10
 
 // 1000Hz polling
-#define USB_POLLING_INTERVAL_MS 1
+#define USB_POLLING_INTERVAL_MS 4
 
 // Increase debounce window from the default of 5ms.  This does not increase
 // key press or release latency since the debounce algorithm is eager.
@@ -50,12 +50,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define POINTING_DEVICE_INVERT_X
 #define PMW33XX_CPI 16000
 #define POINTING_DEVICE_MOTION_PIN C7
+#define PMW33XX_UPLOAD_SROM
 
 // Use 16-bit mouse report values.
 #define MOUSE_EXTENDED_REPORT
 #define WHEEL_EXTENDED_REPORT
 
 #define POINTING_DEVICE_HIRES_SCROLL_ENABLE
+#define POINTING_DEVICE_HIRES_SCROLL_MULTIPLIER 120
+#define POINTING_DEVICE_HIRES_SCROLL_EXPONENT 0
 
 // Double tap a key to lock it.
 #define ONESHOT_TAP_TOGGLE 2
